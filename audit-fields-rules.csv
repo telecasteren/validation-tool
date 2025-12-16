@@ -1,0 +1,129 @@
+﻿Field;Type;Required;ExposeInReporting;Usage;Description;;
+CaseNumber;string;optional;YES;264;"Human readable case number. Not needed to create an audit.
+
+Archieve
+
+relation to original casenumber
+
+When is casenumber generated, should we care about original case number field in sanako etc?";;
+UserId;ObjectId?;required;YES;156;"The ID of the user who created the audit. It is often used to determine the Department https://docs.google.com/document/d/10AXTmgUoqCfsmvi7bZVtsyZMqwCIwZ5lmYaH48_Qxuk/edit?usp=sharing
+
+For cases that are converted we need to link the cases to Cubit users. This mapping must be done after users are created in Cubit. So before conversion the users that exiting cases should be mapped to must be present in Cubit at time of conversion.
+";;
+AssignedTo;ObjectId?;optional;NO;89;The ID of the user assigned to the audit. https://docs.google.com/document/d/10AXTmgUoqCfsmvi7bZVtsyZMqwCIwZ5lmYaH48_Qxuk/edit?usp=sharing could we use this instead of userId + username for onboarded cases without user?;;
+UserName;string;optional;YES;15;The username of the person who created the audit. This field is used for converted audits where there is no userid for the audit. Then this name will show in UI.  https://docs.google.com/document/d/10AXTmgUoqCfsmvi7bZVtsyZMqwCIwZ5lmYaH48_Qxuk/edit?usp=sharing;;
+Type;string;required;YES;371;"The type of audit.
+El types: periodic, newperiodic, verification, revision, elrevision, marketcontrol, groundfault, groundfaultcase, adminitrative, externalgroundfault, concern, documentcontrol, elrevision, extension, fireinvestigation, marketcontrol, mass_communication, newperiodic, siteinspection
+
+Fire types: sweep, sweep_and_fire, fire, specificfire, other_audit, service_assignment, concern. Asked Erling to give a writeup of what all of our types are for";;
+Status;string;required;YES;275;"The current status of the audit. Default value is ""active""
+
+Valid statuses: active, done, resolution, approved, approvednoerrors, approvedwitherrors, cancelled, missed, disconnected
+
+When an audit is created its get status active.
+
+Status cannot be evaluated without looking at planneddate, starteddate and documents in correspondance";;
+Contacts;List<Contact>;required;YES;206;contacts for the case: the customer of electic plant, owners of housing units. Documents and communication made by the case are going towards these contacts ;;
+Targets;List<Target>;required;YES;306;targets meaning the physical object that audit being done towards: electrical plants, housing units, chimneys, companies;;
+Started;DateTime?;optional;YES;131;Start date of the audit. When a button to start it is actually pressed;;
+PlannedTime;DateTime?;required;YES;140;Planned time for the audit. when its planned in calendar, This date affects the sending of notice document;;
+DeadLineDate;DateTime?;optional;YES;92;"its when the next time feedback on the audit has to be received; first time its amount of days taken from the caseflow";;
+ResolutionBy;ObjectId?;optional;YES;37;if resolution document is sent in correspondance it means resolution has passed;;
+ResolutionByName;string;optional;YES;6;if resolution document is sent in correspondance it means resolution has passed;;
+ResolutionDate;DateTime?;optional;YES;29;if resolution document is sent in correspondance it means resolution has passed;;
+CheckList;CheckList;optional;YES;; a list of things that need to be checked on the audit according to a law, they constantly are being updated year over year;;
+RoomTypes;List<RoomType>;optional;YES;;terrible name, this is a structure of errors found during the audit. it contains structure caleld found errors, and all those errors also include fixes and correction data. Order of the data  is important. this requires a separate google doc and proper documentation;;
+Activities;List<AuditActivity>;optional;YES;dreamware;Do need Oyvin to write docs about this;;
+Correspondance;List<AuditCorrespondance>;optional;YES;;all documents related to a case  thats delivered from the system to customers;;
+ElCompanyTefts;List<string>;optional;NO;26;Extremely wrong name for what it is, probably historic reasons since start of the first audit object. In general field holds list of values that we call themes that are related to certain types of audits. Algorithm of how they are picked is complex and not all audit types have it https://docs.google.com/document/d/1O01vcGl0XBEnTqEb1c_nKIrvPfHYeBqdE7otA31xK3Y/edit;;
+ContextHints;List<string>;optional;YES;33;"these context hints is a list if string-keys that impacts logic, for example  [
+        ""sms5days"",
+        ""sms2days""
+    ] means that smses were sent 5days and 2 days before, something like ""nodocuments"" is often used for converted cases meaning that documents wouldnt go out  by automated processes, mostly is used to control document sending, and most important flag is the ""noducuments"" during onboarding process";;
+ExtraValues;Dictionary<string, string>;optional;NO;83;key value pairs stored, it is used for new framework to store alll the answers. Also can be and should be used to store any context values, many of the fields in this entire list could just be an extra value instead of its own standalone field;;
+TransferredToSambasOn;DateTime?;optional;NO;;when did the transfer of Sambas took place;;
+SambasTransferId;int?;optional;NO;;-1 for all done case or closed, null for active cases;;
+SambasFile;string;optional;NO;;transfer file is an actual xml  structure that we send to Sambas;;
+DocumentCategories;List<DocumentCategory>;optional;NO;;when DLE approves document control, each category represented in a field DocumentControlReasons are approved seperately and information for each category ;;
+FormData;FormData;optional;NO;;Cubit forms skjema.cubit.no when forms are submitted they generated audits of type applicaiton/notice from citizens towards cubit customers, this field holds the submitted values of the form that is later used to show the details, upon approval add or remove certain values;;
+MetaData;MetaData;optional;NO;67;Metadata related to the audit. It was an attempt to stop bloating the audit object with all these fields that we see. rather if its a information specific to a specific audit type or situation just save it as metadata. Its not widely used;;
+ComplexErrorStructureId;ObjectId?;optional;NO;;ID of the complex error structure. We store versions of the structure in separate category and this id links to all of them, but algorithm picks the newest one. Oyvind needs to write this;;
+Id;ObjectId;optional;NO;674;mongo db id, auto generated;;
+OriginalCaseNumber;string;optional;NO;3;place holder for cubits case number after archive casenumber is generated for just storing purposes, not really used anywhere ;;
+Title;string;optional;YES;11;The title of the audit.  When case is created the adress of the target are populated into this field. This field can be modified bt user;;
+PinCode;int?;required;YES;38;The pin code associated with the audit. used for corrections only and printed on docs. FIRE pincode is not in use. PinCode+CaseNumber combination is suppose to be unique across tenants for old-corrections to work;;
+AdditionalUserIds;List<ObjectId>;optional;YES;10;List of additional user IDs associated with the audit. https://docs.google.com/document/d/10AXTmgUoqCfsmvi7bZVtsyZMqwCIwZ5lmYaH48_Qxuk/edit?usp=sharing;;
+AdditionalType;string?;optional;NO;40;"Additional type information for the audit.
+El types: administrative, concern, elrevision, extension, fireinvestigation
+
+Fire types: mass_communication";;
+Created;DateTime;required;YES;40;"The creation date of the audit. Default value DateTime.UtcNow;";;
+PreviousStatus;string;optional;NO;12;The previous status of the audit. Status to save what was in status field, convinience field for support and used when reopening a case. Important to set defaults during onboarding, so when ppl reopen old cases we get to a certain state;;
+AutomaticHandling;bool?;optional;NO;17;if its set to false then certai nfuncitonality like reminders being sent automatically will not take place ;;
+AutomaticParking;bool?;optional;NO;3;Only works for Elvia tenant, enables functionality that parks audits automatically when certain criterias are met;;
+ConfirmationStatus;string;optional;NO;24;a confirmation is that a receiving end of the audit confirmed that they will be there on time and audit can be performed;;
+ConfirmationStatusBy;string;optional;NO;7;confirmation can be done by sms or user can it it manually if they were contacted by other means;;
+ConfirmationStatusOn;DateTime?;optional;NO;7;"when the confirmation happened ""ConfirmationStatus""";;
+Comment;string;optional;YES;12;asimple text general comment added by inspector and used later  in different scenarios like document building with merge fields ;;
+Notes;List<AuditNote>;optional;YES;6;rich text notes, so inspector can take add thee notes with who added and timestamp on the audit;;
+CustomerPresent;string;optional;NO;4;"A field for weed abatement, has values of ""none"", ""no"", ""customer"", ""owner"", really other fields should have been reused, this is refactoring material";;
+ContactNumberPresent;string;optional;YES;2;a representation of Number in Contacts array, so  it can be found in the contacts array and returned as somebody who was at the audit, used when actual owner/customer was at the place;;
+PresentAtAudit;string;optional;YES;6;when doing audit, in summary page they are required to fill who was present during the audit, if non customer/owner, its a free text field to fill the value of who was tehre;;
+CustomerDetailsVerified;bool;optional;NO;2;a boolean that inspector checks during audit - for EL, not present for Fire/MHV;;
+AuditManualContactName;string;optional;YES;6;;;
+SignatureImageName;string;optional;NO;2;SignatureImageName  (must be moved to extra values) is just name of the file directly related to signature url field, ;;
+CalendarComment;string;optional;YES;14;Just a freetext comment to be shown on calendar ;;
+DirectResolution;bool;optional;NO;29;a flag for very serious errors to make fast resolution, IF SKS is doing the audit, a case will be sent to DLE and usually dealt with in very short amount of time;;
+MinimumNoticeDays;int?;optional;YES;;amount of days before the notice issent, can be changed in caseflow settings;;
+NoNotice;bool;optional;YES;;"Indicates if no notice should be sent. Used in either specific ""suprise"" audits like siteinspection or in scenarios where we specifically want the notice not be sent";;
+Duration;int?;optional;YES;;planned duration of the audit, like 60min 30 min etc so the calendar could know how much space it take;;
+PostponementApplications;List<AuditPostponementApplication>;optional;NO;;Application to postpone a fix deadline for an activity in handling tab. Uses a list of postponement applications that could be approved/rejected using acceptances logic and sets a new deadline if accepted. (currently - for the whole audit I believe, but it might be in works or thoughts to have it per activity);;
+FeedbackComment;string;optional;YES;;;;
+AuditPictures;List<AuditPicture>;optional;YES;;Pictures uploaded by inspector on Audit level that are not yet assigned to any errorrs;;
+OtherFinds;List<CheckListEntry>;optional;NO;;all other errors that are not in the checklist, marked as itnernal, because we  can determine this from roomtypes/all errors coming from customer;;
+ConnectedAudits;List<ConnectedAudit>;optional;YES;;a connected audit link;;
+RelatedAudits;List<ConnectedAudit>;optional;YES;;(BsonIgnore);;
+DocumentControlReasons;List<string>;optional;NO;;"Very specific set of poorly designed strings used in casetype ""documentcontrol""  that are added by automated process national-company-sync when a change in electrical company happens so people could file documents required by law based on these categories";;
+DocumentControlHandledBy;ObjectId?;optional;YES;;"Id of a user who actually saves the approval of the document control; UserId on doc controls is automation user from national-sync";;
+GroundFaultCategory;int?;optional;YES;;value of 1,2,3 meaning is unknown, only used in reports, is it still used? by elvia?;;
+DistanceFromPrevious;int?;optional;NO;;Unused field, an experiment that was suppose to be a feature about navigation audit to audit;;
+DurationFromPrevious;int?;optional;NO;;Unused field, an experiment that was suppose to be a feature about navigation audit to audit;;
+Tags;List<string>;optional;YES;;simple string based tags that later are being used in search for example;;
+DocumentsToSendManually;List<CaseFlowEntry>;optional;NO;;;;
+HasDocumentsToSendManually;bool;optional;NO;;flag for DocumentsToSendManually;;
+Accessibility;string;optional;YES;7;"string value that is a string but can be either ""open"", ""restricted"", ""awaiting"" represents if a case should be visible for any user";;
+AccessibilityParagraph;string;optional;YES;5;archive system required field to generate case number;;
+AccessTo;List<ObjectId>;optional;YES;9;list of users, groups, departments and similar that have access to this case if access is 'restricted' or 'awaiting';;
+ContextIndicator;string;optional;NO;;(BsonIgnore);;
+ContextDate;DateTime?;optional;NO;;(BsonIgnore);;
+NoOfErrors;int;optional;NO;;(BsonIgnore) ;;
+NoOfRemarks;int;optional;NO;;(BsonIgnore) ;;
+NoOfErrorsFixed;int;optional;NO;;(BsonIgnore);;
+DisconnectionFixed;bool;optional;NO;;(BsonIgnore);;
+AllUnresolvedAreDisconnections;bool;optional;NO;;(BsonIgnore) ;;
+OutlookId;string;optional;NO;;Outlook ID related to the audit. When certain changes happen on the audit like planned time and similar, we need to update linked users outlook ;;
+TransferredToDsbOn;DateTime?;optional;YES;not used since 2019;;;
+TransferredToDsbBy;ObjectId?;optional;YES;not used since 2019;;;
+DsbCaseNumberReceivedOn;DateTime?;optional;YES;not used since 2019;;;
+DsbCaseNumberReceivedBy;ObjectId?;optional;YES;not used since 2019;;;
+DsbCaseNumber;string;optional;YES;not used since 2019;;;
+DsbFollowUps;List<DsbFollowUp>;optional;YES;not used since 2019;;;
+ControlListResponses;List<ControlListResponse>;optional;YES;;;;
+GroundFaultOutput;List<Dictionary<string, string>>;optional;YES;;;;
+GroundFaultInput;Dictionary<string, string>;optional;YES;;;;
+GraphData;List<GraphData>;optional;YES;;;;
+Acceptances;List<Acceptance>;optional;NO;;There are certain audit types that go through process of multiple people confirming something in order for it to proceed. This list holds information of who suppose to confirm and at what state is this. peer review can be done by any user in the tenant;;
+Sanctions;List<Sanction>;optional;YES;;should be descriebd by Oyvind;;
+FormBuilderData;dynamic;optional;NO;;There is a functionality to build custom forms, used for fire tenants, feature-switchable, once you build those you can assign them to audits and in some scenarios a contact person of the audit  gets a link to cubit-forms for example that prefills some data, like answers questions and that data. Other usecase would be mapping case, where you generate form builder data inside the case and later it is sent to cubit-forms;;
+MappingResponses;List<MappingResponse>;optional;NO;;The results posted to a custom form rendered by FormBuilderData. These custom forms are used in our cubit-forms project, in sanako for pismo;;
+GotConvertedToTargetContactStyle;bool;optional;YES;not used in code;;;
+LetterTemplate;DocumentText;optional;NO;3;a draftjs object of structure that is converted to html and sent to users, only used in specific casetype mass_communication;;
+SafeWorkAnalysis;List<SafeWorkAnalysis>;optional;NO;not used since 2022;;;
+AuditGroupId;ObjectId?;optional;NO;;Related to very specific case type fire_group_owner, which refers to collection AuditGroup, in order to do entire building in one case ;;
+ComplexErrorStructure;ComplexErrorStructure;optional;YES;25;(BsonIgnore) Complex error structure. all these bsonIgnore values are just lazyness to create data transfer objects when getting an audit from frontend, so you could just prefill it with information you want like loaded structure in this example or when sending these values in backend between the methods. Oyvind needs to write about this;;
+ComplexErrorStructureCategoryIds;Dictionary<string, ObjectId>;optional;YES;;;;
+SignatureImageUrl;string;optional;NO;;Field that stored blob storage url where the image of a person signature is uploaded. Seldomly used only in pismo ;;
+;;optional;YES;;;;
+;;optional;YES;;;;
+Redundand field;;optional;YES;;;;
+BsonIgnore field, meaning its not used for storage of data in database, but for inner logic, not important;;optional;YES;;;;
